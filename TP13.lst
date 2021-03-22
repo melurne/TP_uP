@@ -1,0 +1,104 @@
+gavrasm Gerd's AVR assembler version 3.3 (C)2012 by DG4FAC
+----------------------------------------------------------
+Fichier source: TP13.asm
+Fichier hex : TP13.hex
+Fichier Eeprom : TP13.eep
+Compile : 15.03.2021, 16:08:00
+Passe :        2
+     1: .equ DDRA=0x01
+     2: .equ PORTA = 0x02
+     3: 
+     4: .equ DDRC=0x07
+     5: .equ PORTC=0x08
+     6: .equ PINC=0x06
+     7: 
+     8: .equ spl=0x3D
+     9: .equ sph=0x3E
+    10: 
+    11: .org 0x0000
+    12: 000000   940C  jmp setup
+        000001   0090
+    13: 
+    14: .org 0x0080
+    15: 
+    16: codeClavier: .DB 0b01000001, 0b10001000, 0b01001000, 0b00101000, 0b10000100, 0b01000100, 0b00100100, 0b10000010, 0b01000010, 0b00100010, 0b10000001, 0b00100001, 0b00010001, 0b00010010, 0b00010100, 0b00011000
+        000080 8841 2848 4484 8224
+        000084 2242 2181 1211 1814
+    17: codeAff: .DB 0b01111110, 0b00001100, 0b00110111, 0b00011111, 0b01001101, 0b01011011, 0b01111011, 0b00001110, 0b01111111, 0x5f, 0b01101111, 0b01111001, 0b00110001, 0b00111101, 0b01110011, 0b01100011
+        000088 0C7E 1F37 5B4D 0E7B
+        00008C 5F7F 796F 3D31 6373
+    18: 
+    19: setup:
+    20: 000090   E201  ldi r16,0x21
+    21: 000091   EF1F  ldi r17,0xff
+    22: 000092   BF1D  out spl,r17
+    23: 000093   BF0E  out sph,r16
+    24: 	
+    25: 000094   EF0F  ldi r16,0xFf
+    26: 000095   B901  out DDRA,r16
+    27: 	
+    28: 000096   EF00  ldi r16,0xF0
+    29: 000097   B907  out DDRC,r16
+    30: 	
+    31: 000098   E001  ldi r16,0x01
+    32: 000099   B902  out PORTA,r16
+    33: 	
+    34: debut:
+    35: 00009A   2744  CLR r20
+    36: 00009B   E051  ldi R21,1
+    37: boucle: 
+    38: 00009C   E0E0  ldi R30,low(codeClavier<<1)
+    39: 00009D   E0F1  ldi R31,high(codeClavier<<1)
+    40: 00009E   0FE5  ADD R30,R21
+    41: 00009F   9114  LPM R17,Z
+    42: 0000A0   B918  OUT PORTC,r17
+    43: 	
+    44: 	
+    45: 0000A1   0000  nop
+    46: 0000A2   0000  nop
+    47: 0000A3   0000  nop
+    48: 0000A4   0000  nop
+    49: 0000A5   B126  IN r18,PINC
+    50: 	; AND r18,r17
+    51: 0000A6   1721  CP r18,r17
+    52: 0000A7   F419  BRNE fin
+    53: 0000A8   2F45  MOV r20,R21
+    54: 0000A9   940E  CALL affiche
+        0000AA   00B0
+    55: fin:
+    56: 0000AB   9553  INC R21
+    57: 0000AC   3151  CPI R21,17
+    58: 0000AD   F771  BRNE boucle
+    59: 0000AE   940C  jmp debut
+        0000AF   009A
+    60: 	
+    61: affiche:
+    62: 0000B0   E1E0  LDI R30,low(codeAff<<1)
+    63: 0000B1   E0F1  LDI R31,high(codeAff<<1)
+    64: 0000B2   0FE4  ADD R30,r20
+    65: 0000B3   9114  LPM r17,Z
+    66: 0000B4   E830  ldi r19,0x80
+    67: 0000B5   B938  out PORTC,r19
+    68: 0000B6   B912  out PORTA,r17
+    69: 0000B7   940E  call Pause
+        0000B8   00BA
+    70: 0000B9   9508  ret
+    71: 	
+    72: Pause:
+    73: 0000BA   E088  ldi r24,8
+    74: tempo:
+    75: 0000BB   5061  subi r22,1
+    76: 0000BC   4070  sbci r23,0
+    77: 0000BD   4080  sbci r24,0
+    78: 0000BE   F7E0  brcc tempo
+    79: 0000BF   9508  ret
+ -> Attention 006: Le materiel n'est pas specfie, le code ne sera pas verifie !
+ -> Attention 010: Jeu d'instructions peu clair, pas de documentation !
+
+Programme              :       50 words.
+Constantes             :       16 words.
+Memoire totale occupee :       66 words.
+Taille en  Eeprom      :        0 bytes.
+Segment de donnees     :        0 bytes.
+Compilation terminee, pas d'erreur.
+Compilation terminee 15.03.2021, 16:08:00

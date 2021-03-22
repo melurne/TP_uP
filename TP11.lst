@@ -1,0 +1,67 @@
+gavrasm Gerd's AVR assembler version 3.3 (C)2012 by DG4FAC
+----------------------------------------------------------
+Fichier source: TP11.asm
+Fichier hex : TP11.hex
+Fichier Eeprom : TP11.eep
+Compile : 08.03.2021, 17:00:39
+Passe :        2
+     1: .equ DDRA=0x01
+     2: .equ PORTA = 0x02
+     3: 
+     4: .equ DDRB = 0x04
+     5: .equ PORTB = 0x05
+     6: 
+     7: .org 0x0000
+     8: 000000   940C  jmp debut
+        000001   0080
+     9: 
+    10: .org 0x0080
+    11: 
+    12: debut:
+    13: 000080   EF0F  ldi r16,0xff
+    14: 000081   B901  out DDRA,r16
+    15: 000082   B904  out DDRB,r16
+    16: 000083   E001  ldi r16,0x01
+    17: 000084   2744  CLR r20
+    18: 000085   2711  CLR r17
+    19: boucleA:
+    20: 000086   B915  out PORTB,r17
+    21: 000087   B902  out PORTA,r16
+    22: 000088   0F00  lsl r16
+    23: 000089   9543  INC r20
+    24: 00008A   940E  CALL Pause
+        00008B   009A
+    25: 00008C   3048  CPI r20,8
+    26: 00008D   F7C1  BRNE boucleA
+    27: 00008E   E800  ldi r16,0b10000000
+    28: 00008F   2744  CLR r20
+    29: boucleB:
+    30: 000090   B912  out PORTA,r17
+    31: 000091   B905  out PORTB,r16
+    32: 000092   9506  lsr r16
+    33: 000093   9543  INC r20
+    34: 000094   940E  CALL Pause
+        000095   009A
+    35: 000096   3048  CPI r20,8
+    36: 000097   F7C1  BRNE boucleB
+    37: 000098   940C  jmp debut
+        000099   0080
+    38: 
+    39: Pause:
+    40: 00009A   E088  ldi r24,8
+    41: tempo:
+    42: 00009B   5061  subi r22,1
+    43: 00009C   4070  sbci r23,0
+    44: 00009D   4080  sbci r24,0
+    45: 00009E   F7E0  brcc tempo
+    46: 00009F   9508  ret
+ -> Attention 006: Le materiel n'est pas specfie, le code ne sera pas verifie !
+ -> Attention 010: Jeu d'instructions peu clair, pas de documentation !
+
+Programme              :       34 words.
+Constantes             :        0 words.
+Memoire totale occupee :       34 words.
+Taille en  Eeprom      :        0 bytes.
+Segment de donnees     :        0 bytes.
+Compilation terminee, pas d'erreur.
+Compilation terminee 08.03.2021, 17:00:39

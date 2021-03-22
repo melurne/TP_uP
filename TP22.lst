@@ -1,0 +1,136 @@
+gavrasm Gerd's AVR assembler version 3.3 (C)2012 by DG4FAC
+----------------------------------------------------------
+Fichier source: TP22.asm
+Fichier hex : TP22.hex
+Fichier Eeprom : TP22.eep
+Compile : 22.03.2021, 15:52:11
+Passe :        2
+     1: .equ DDRA=0x01
+     2: .equ PORTA = 0x02
+     3: 
+     4: ;.equ DDRC=0x07
+     5: ;.equ PORTC=0x08
+     6: ;.equ PINC=0x06
+     7: 
+     8: .equ WDTCSR = 0x60
+     9: 
+    10: .org 0x0000
+    11: 000000   940C  jmp setup
+        000001   0088
+    12: 
+    13: .org 0x0018
+    14: 000018   940C  JMP IRQ_WD
+        000019   009A
+    15: 
+    16: .org 0x0080
+    17: 
+    18: 
+    19: 
+    20: codeAff: .DB 0b01111110, 0b00001100, 0b00110111, 0b00011111, 0b01001101, 0b01011011, 0b01111011, 0b00001110, 0b01111111, 0x5f, 0b01101111, 0b01111001, 0b00110001, 0b00111101, 0b01110011, 0b01100011
+        000080 0C7E 1F37 5B4D 0E7B
+        000084 5F7F 796F 3D31 6373
+    21: 
+    22: setup:
+    23:     ; 	DDRA@IO <- 0xFF
+    24: 000088   EF0F  LDI R16,0xFF
+    25: 000089   B901  OUT DDRA,R16
+    26: 
+    27: 	;DDRC@IO <- 0xF0
+    28:     ; 	PORTA@IO <- 0x00
+    29: 00008A   E000  LDI R16,0x00
+    30: 00008B   B902  OUT PORTA,R16
+    31: 
+    32: 
+    33:     ; 	WDTCSR <- 0x10
+    34: 00008C   E100  LDI R16,0x10
+    35: 00008D   9300  STS WDTCSR,R16
+        00008E   0060
+    36: 
+    37:     ; 	WDTCSR <- 0b01000110
+    38: 00008F   E406  LDI R16,0b01000110
+    39: 000090   9300  STS WDTCSR,R16
+        000091   0060
+    40: 
+    41: 000092   9478  sei
+    42: 
+    43: 000093   2744  CLR r20
+    44:     ; 	portA@IO <- 0xFF
+    45: 000094   EF0F  LDI R16,0xFF
+    46: 000095   B902  OUT portA,R16
+    47: 
+    48: 
+    49: boucle:
+    50: 	;INC r20
+    51: 000096   940E  CALL affiche
+        000097   00AB
+    52: 000098   940C  jmp boucle
+        000099   0096
+    53: 
+    54: IRQ_WD:
+    55:     ; 	si (r20 >= 15) alors saut res
+    56: 00009A   2F04  MOV R16,R20
+    57: 00009B   930F  PUSH R16
+    58: 00009C   E00F  LDI R16,15
+    59: 00009D   911F  POP R17
+    60: 00009E   1710  CP R17,R16
+    61: 00009F   F410  BRSH eti0
+    62: 0000A0   2700  CLR R16
+    63: 0000A1   C001  RJMP eti1
+    64: eti0:
+    65: 0000A2   E001  LDI R16,0x01
+    66: eti1:
+    67: 0000A3   2300  TST R16
+    68: 0000A4   F011  BREQ eti2
+    69: 0000A5   940C  JMP res
+        0000A6   00A9
+    70: eti2:
+    71: 
+    72: 0000A7   9543  INC r20
+    73: 0000A8   9518  reti
+    74: 	res:
+    75: 0000A9   2744  CLR r20
+    76: 0000AA   9518  reti
+    77: 
+    78: affiche:
+    79:     ; 	PORTA@IO <- codeAff[r20]
+    80: 0000AB   2F04  MOV R16,R20
+    81: 0000AC   E8A0  LDI R26,low(codeAff)
+    82: 0000AD   E0B0  LDI R27,high(codeAff)
+    83: 0000AE   2711  CLR R17
+    84: 0000AF   0FA0  ADD R26,R16
+    85: 0000B0   1FB1  ADC R27,R17
+    86: 0000B1   910C  LD R16,X
+    87: 0000B2   B902  OUT PORTA,R16
+    88: 
+    89: 0000B3   9508  ret
+    90: 
+    91: affiche_:
+    92: 0000B4   E0E0  LDI R30,low(codeAff<<1)
+    93: 0000B5   E0F1  LDI R31,high(codeAff<<1)
+    94: 0000B6   0FE4  ADD R30,r20
+    95: 0000B7   9134  LPM r19,Z
+    96: 	;ldi r21,0x80
+    97: 	;out PORTC,r21
+    98: 0000B8   B932  out PORTA,r19
+    99: 	;call Pause
+   100: 0000B9   9508  ret
+   101: 
+   102: Pause:
+   103: 0000BA   E088  ldi r24,8
+   104: tempo:
+   105: 0000BB   5061  subi r22,1
+   106: 0000BC   4070  sbci r23,0
+   107: 0000BD   4080  sbci r24,0
+   108: 0000BE   F7E0  brcc tempo
+   109: 0000BF   9508  ret
+ -> Attention 006: Le materiel n'est pas specfie, le code ne sera pas verifie !
+ -> Attention 010: Jeu d'instructions peu clair, pas de documentation !
+ -> Attention 001: 2 symbole(s) defini mais inutilise !
+
+Programme              :       60 words.
+Constantes             :        8 words.
+Memoire totale occupee :       68 words.
+Taille en  Eeprom      :        0 bytes.
+Segment de donnees     :        0 bytes.
+Compilation terminee, pas d'erreur.
+Compilation terminee 22.03.2021, 15:52:11

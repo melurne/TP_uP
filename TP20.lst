@@ -1,0 +1,53 @@
+gavrasm Gerd's AVR assembler version 3.3 (C)2012 by DG4FAC
+----------------------------------------------------------
+Fichier source: TP20.asm
+Fichier hex : TP20.hex
+Fichier Eeprom : TP20.eep
+Compile : 22.03.2021, 13:48:12
+Passe :        1
+     1: .equ PINA = 0x00
+     2: .equ DDRA = 0x01
+     3: .equ PORTA = 0x02
+     4: 
+     5: .equ WDTCSR = 0x60
+     6: 
+     7: .org 0x0000
+     8: 000000   940C  jmp debut
+        000001   0000
+     9: 
+    10: .org 0x0080
+    11: 
+    12: debut:
+    13: 000080   E001  LDI r16,0x01
+    14: 000081   B901  OUT DDRA,r16
+    15: 000082   E000  LDI r16,0x00
+Erreur ==> 	OUT¨PORTA,r16
+[TP20.asm,16] 070: Instruction ou macro inconnue !
+    17: 	
+    18: 000083   E100  LDI r16, 0x10
+    19: 000084   9300  STS WTDCSR,r16
+        000085   0000
+    20: 000086   E00E  LDI r16,0x0E
+    21: 000087   9300  STS WTDCSR,r16
+        000088   0000
+    22: 000089   9478  SEI
+    23: 	
+    24: boucle:
+    25: 00008A   B000  IN PINA,r17
+    26: 00008B   7012  ANDI r17,0x02
+    27: 00008C   3010  CPI r17,0
+    28: 00008D   F001  BREQ boucle
+    29: 	
+    30: 00008E   E011  LDI r17,0x01
+    31: 00008F   B912  OUT PORTA,r17
+    32: 	
+    33: 000090   E100  LDI r16,0x10
+    34: 000091   9300  STS WTDCSR,r16
+        000092   0000
+    35: 000093   E000  LDI r16,0x00
+    36: 000094   9300  STS WTDCSR,r16
+        000095   0000
+    37: 	
+    38: 000096   940C  JMP boucle
+        000097   008A
+Compilation interrompue, une erreur !

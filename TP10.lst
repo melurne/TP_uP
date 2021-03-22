@@ -1,0 +1,38 @@
+gavrasm Gerd's AVR assembler version 3.3 (C)2012 by DG4FAC
+----------------------------------------------------------
+Fichier source: TP10.asm
+Fichier hex : TP10.hex
+Fichier Eeprom : TP10.eep
+Compile : 08.03.2021, 16:24:17
+Passe :        2
+     1: .equ PINA = 0x00
+     2: .equ DDRA=0x01
+     3: .equ PORTA = 0x02
+     4: 
+     5: .org 0x0000
+     6: 000000   940C  jmp debut
+        000001   0080
+     7: 
+     8: .org 0x0080
+     9: 
+    10: debut:
+    11: 000080   E001  ldi r16,0x01
+    12: 000081   B901  out DDRA,r16
+    13: 
+    14: boucle:
+    15: 000082   B100  in	r16,PINA
+    16: 000083   9506  lsr r16
+    17: 000084   B902  out PORTA,r16
+    18: 	
+    19: 000085   940C  jmp boucle
+        000086   0082
+ -> Attention 006: Le materiel n'est pas specfie, le code ne sera pas verifie !
+ -> Attention 010: Jeu d'instructions peu clair, pas de documentation !
+
+Programme              :        9 words.
+Constantes             :        0 words.
+Memoire totale occupee :        9 words.
+Taille en  Eeprom      :        0 bytes.
+Segment de donnees     :        0 bytes.
+Compilation terminee, pas d'erreur.
+Compilation terminee 08.03.2021, 16:24:17

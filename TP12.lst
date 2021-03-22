@@ -1,0 +1,65 @@
+gavrasm Gerd's AVR assembler version 3.3 (C)2012 by DG4FAC
+----------------------------------------------------------
+Fichier source: TP12.asm
+Fichier hex : TP12.hex
+Fichier Eeprom : TP12.eep
+Compile : 15.03.2021, 14:24:30
+Passe :        2
+     1: .equ DDRA=0x01
+     2: .equ PORTA = 0x02
+     3: 
+     4: .equ DDRC=0x07
+     5: .equ PORTC=0x08
+     6: 
+     7: .org 0x0000
+     8: 000000   940C  jmp setup
+        000001   0080
+     9: 
+    10: .org 0x0080
+    11: 
+    12: setup:
+    13: 000080   EF0F  ldi r16,0xff
+    14: 000081   B907  out DDRC,r16
+    15: 000082   E800  ldi r16,0x80
+    16: 000083   B908  out PORTC,r16
+    17: 000084   E70F  ldi r16,0x7f
+    18: 000085   B901  out DDRA,r16
+    19: 	codeAff: .DB 0b01111110, 0b00001100, 0b00110111, 0b00011111, 0b01001101, 0b01011011, 0b01111011, 0b00001110, 0b01111111, 0x5f, 0b01101111, 0b01111001, 0b00110001, 0b00111101, 0b01110011, 0b01100011
+        000086 0C7E 1F37 5B4D 0E7B
+        00008A 5F7F 796F 3D31 6373
+    20: debut:
+    21: 00008E   2744  CLR r20
+    22: 	
+    23: boucle:
+    24: 00008F   E0EC  LDI R30,low(codeAff<<1)
+    25: 000090   E0F1  LDI R31,high(codeAff<<1)
+    26: 000091   0FE4  ADD R30,r20
+    27: 000092   9114  LPM r17,Z
+    28: 000093   B912  out PORTA,r17
+    29: 000094   940E  CALL Pause
+        000095   009B
+    30: 000096   9543  INC r20
+    31: 000097   3140  CPI r20,16
+    32: 000098   F7B1  BRNE boucle
+    33: 000099   940C  jmp debut
+        00009A   008E
+    34: 	
+    35: 	
+    36: Pause:
+    37: 00009B   E088  ldi r24,8
+    38: tempo:
+    39: 00009C   5061  subi r22,1
+    40: 00009D   4070  sbci r23,0
+    41: 00009E   4080  sbci r24,0
+    42: 00009F   F7E0  brcc tempo
+    43: 0000A0   9508  ret
+ -> Attention 006: Le materiel n'est pas specfie, le code ne sera pas verifie !
+ -> Attention 010: Jeu d'instructions peu clair, pas de documentation !
+
+Programme              :       27 words.
+Constantes             :        8 words.
+Memoire totale occupee :       35 words.
+Taille en  Eeprom      :        0 bytes.
+Segment de donnees     :        0 bytes.
+Compilation terminee, pas d'erreur.
+Compilation terminee 15.03.2021, 14:24:30
