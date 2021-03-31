@@ -1,0 +1,95 @@
+.equ DDRA=0x01
+.equ PORTA = 0x02
+
+.equ DDRB = 0x04
+.equ PORTB = 0x05
+
+.equ DDRC=0x07
+.equ PORTC=0x08
+
+.equ OCRA = 0x47
+.equ TCCRA = 0x44
+.equ TCCRB = 0x45
+.equ TIMSK = 0x6E
+
+.org 0x0000
+	jmp setup
+
+.org 0x002A
+	JMP IRQ_timer	
+	
+.org 0x0080
+
+codeAff: .DB 0b01111110, 0b00001100, 0b00110111, 0b00011111, 0b01001101, 0b01011011, 0b01111011, 0b00001110, 0b01111111, 0x5f, 0b01101111, 0b01111001, 0b00110001, 0b00111101, 0b01110011, 0b01100011
+
+setup:
+	DDRA@IO <- 0xFF
+	PORTA@IO <- 0x00
+	DDRC@IO <- 0xE0
+	PORTC@IO <- 0x00
+	
+	OCRA <- 40
+	TCCRA <- 0x02
+	TCCRB <- 0x05
+	TIMSK <- 0x02
+	
+	sei
+	
+	CLR r18
+	r23 <- 0x20
+	
+	CLR r19
+	CLR r20
+	CLR r21
+	CLR r22
+	portA@IO <- 0xFF
+	
+boucle:
+	
+	CALL affiche
+	jmp boucle
+	
+IRQ_timer:
+	INC r18
+	si (r18 >= 100) alors saut increm
+		si (r23 == 0x80) alors saut etc80
+			si (r23 == 0x40) alors saut etc40
+				
+				r23 <- 0x40
+				PORTC@IO <- r23
+				MOV r19,r21
+				reti
+		etc40:
+			r23 <- 0x80
+			PORTC@IO <- r23
+			MOV r19,r22
+			reti
+		
+		etc80:
+			r23 <- 0x20
+			PORTC@IO <- r23
+			MOV r19,r20
+			reti
+	increm:
+	CLR r18
+	si (r20 >= 9) alors saut res
+		INC r20
+		
+		reti
+	res:
+		CLR r20
+		INC r21
+	si (r21 <= 9) alors saut end
+		CLR r21
+		INC r22
+	si (r22 <= 9) alors saut end
+		CLR r20
+		CLR r21
+		CLR r22
+	end:	
+	reti
+
+affiche:
+	PORTA@IO <- codeAff@ROM[r19]
+	ret
+	

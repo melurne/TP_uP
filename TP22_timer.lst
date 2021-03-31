@@ -1,0 +1,284 @@
+gavrasm Gerd's AVR assembler version 3.3 (C)2012 by DG4FAC
+----------------------------------------------------------
+Fichier source: TP22_timer.asm
+Fichier hex : TP22_timer.hex
+Fichier Eeprom : TP22_timer.eep
+Compile : 29.03.2021, 17:45:00
+Passe :        2
+     1: .equ DDRA=0x01
+     2: .equ PORTA = 0x02
+     3: 
+     4: .equ DDRB = 0x04
+     5: .equ PORTB = 0x05
+     6: 
+     7: .equ DDRC=0x07
+     8: .equ PORTC=0x08
+     9: 
+    10: .equ OCRA = 0x47
+    11: .equ TCCRA = 0x44
+    12: .equ TCCRB = 0x45
+    13: .equ TIMSK = 0x6E
+    14: 
+    15: .org 0x0000
+    16: 000000   940C  jmp setup
+        000001   0088
+    17: 
+    18: .org 0x002A
+    19: 00002A   940C  JMP IRQ_timer	
+        00002B   00AA
+    20: 
+    21: .org 0x0080
+    22: 
+    23: codeAff: .DB 0b01111110, 0b00001100, 0b00110111, 0b00011111, 0b01001101, 0b01011011, 0b01111011, 0b00001110, 0b01111111, 0x5f, 0b01101111, 0b01111001, 0b00110001, 0b00111101, 0b01110011, 0b01100011
+        000080 0C7E 1F37 5B4D 0E7B
+        000084 5F7F 796F 3D31 6373
+    24: 
+    25: setup:
+    26:     ; 	DDRA@IO <- 0xFF
+    27: 000088   EF0F  LDI R16,0xFF
+    28: 000089   B901  OUT DDRA,R16
+    29: 
+    30:     ; 	PORTA@IO <- 0x00
+    31: 00008A   E000  LDI R16,0x00
+    32: 00008B   B902  OUT PORTA,R16
+    33: 
+    34:     ; 	DDRC@IO <- 0xE0
+    35: 00008C   EE00  LDI R16,0xE0
+    36: 00008D   B907  OUT DDRC,R16
+    37: 
+    38:     ; 	PORTC@IO <- 0x00
+    39: 00008E   E000  LDI R16,0x00
+    40: 00008F   B908  OUT PORTC,R16
+    41: 
+    42: 
+    43:     ; 	OCRA <- 40
+    44: 000090   E208  LDI R16,40
+    45: 000091   9300  STS OCRA,R16
+        000092   0047
+    46: 
+    47:     ; 	TCCRA <- 0x02
+    48: 000093   E002  LDI R16,0x02
+    49: 000094   9300  STS TCCRA,R16
+        000095   0044
+    50: 
+    51:     ; 	TCCRB <- 0x05
+    52: 000096   E005  LDI R16,0x05
+    53: 000097   9300  STS TCCRB,R16
+        000098   0045
+    54: 
+    55:     ; 	TIMSK <- 0x02
+    56: 000099   E002  LDI R16,0x02
+    57: 00009A   9300  STS TIMSK,R16
+        00009B   006E
+    58: 
+    59: 
+    60: 00009C   9478  sei
+    61: 
+    62: 00009D   2722  CLR r18
+    63:     ; 	r23 <- 0x20
+    64: 00009E   E200  LDI R16,0x20
+    65: 00009F   2F70  MOV R23,R16
+    66: 
+    67: 
+    68: 0000A0   2733  CLR r19
+    69: 0000A1   2744  CLR r20
+    70: 0000A2   2755  CLR r21
+    71: 0000A3   2766  CLR r22
+    72:     ; 	portA@IO <- 0xFF
+    73: 0000A4   EF0F  LDI R16,0xFF
+    74: 0000A5   B902  OUT portA,R16
+    75: 
+    76: 
+    77: boucle:
+    78: 
+    79: 0000A6   940E  CALL affiche
+        0000A7   0118
+    80: 0000A8   940C  jmp boucle
+        0000A9   00A6
+    81: 
+    82: IRQ_timer:
+    83: 0000AA   9523  INC r18
+    84:     ; 	si (r18 >= 100) alors saut increm
+    85: 0000AB   2F02  MOV R16,R18
+    86: 0000AC   930F  PUSH R16
+    87: 0000AD   E604  LDI R16,100
+    88: 0000AE   911F  POP R17
+    89: 0000AF   1710  CP R17,R16
+    90: 0000B0   F410  BRSH eti0
+    91: 0000B1   2700  CLR R16
+    92: 0000B2   C001  RJMP eti1
+    93: eti0:
+    94: 0000B3   E001  LDI R16,0x01
+    95: eti1:
+    96: 0000B4   2300  TST R16
+    97: 0000B5   F011  BREQ eti2
+    98: 0000B6   940C  JMP increm
+        0000B7   00E4
+    99: eti2:
+   100: 
+   101:     ; 		si (r23 == 0x80) alors saut etc80
+   102: 0000B8   2F07  MOV R16,R23
+   103: 0000B9   930F  PUSH R16
+   104: 0000BA   E800  LDI R16,0x80
+   105: 0000BB   911F  POP R17
+   106: 0000BC   1710  CP R17,R16
+   107: 0000BD   F011  BREQ eti3
+   108: 0000BE   2700  CLR R16
+   109: 0000BF   C001  RJMP eti4
+   110: eti3:
+   111: 0000C0   E001  LDI R16,0x01
+   112: eti4:
+   113: 0000C1   2300  TST R16
+   114: 0000C2   F011  BREQ eti5
+   115: 0000C3   940C  JMP etc80
+        0000C4   00DE
+   116: eti5:
+   117: 
+   118:     ; 			si (r23 == 0x40) alors saut etc40
+   119: 0000C5   2F07  MOV R16,R23
+   120: 0000C6   930F  PUSH R16
+   121: 0000C7   E400  LDI R16,0x40
+   122: 0000C8   911F  POP R17
+   123: 0000C9   1710  CP R17,R16
+   124: 0000CA   F011  BREQ eti6
+   125: 0000CB   2700  CLR R16
+   126: 0000CC   C001  RJMP eti7
+   127: eti6:
+   128: 0000CD   E001  LDI R16,0x01
+   129: eti7:
+   130: 0000CE   2300  TST R16
+   131: 0000CF   F011  BREQ eti8
+   132: 0000D0   940C  JMP etc40
+        0000D1   00D8
+   133: eti8:
+   134: 
+   135: 
+   136:     ; 				r23 <- 0x40
+   137: 0000D2   E400  LDI R16,0x40
+   138: 0000D3   2F70  MOV R23,R16
+   139: 
+   140:     ; 				PORTC@IO <- r23
+   141: 0000D4   2F07  MOV R16,R23
+   142: 0000D5   B908  OUT PORTC,R16
+   143: 
+   144: 0000D6   2F35  MOV r19,r21
+   145: 0000D7   9518  reti
+   146: 		etc40:
+   147:     ; 			r23 <- 0x80
+   148: 0000D8   E800  LDI R16,0x80
+   149: 0000D9   2F70  MOV R23,R16
+   150: 
+   151:     ; 			PORTC@IO <- r23
+   152: 0000DA   2F07  MOV R16,R23
+   153: 0000DB   B908  OUT PORTC,R16
+   154: 
+   155: 0000DC   2F36  MOV r19,r22
+   156: 0000DD   9518  reti
+   157: 
+   158: 		etc80:
+   159:     ; 			r23 <- 0x20
+   160: 0000DE   E200  LDI R16,0x20
+   161: 0000DF   2F70  MOV R23,R16
+   162: 
+   163:     ; 			PORTC@IO <- r23
+   164: 0000E0   2F07  MOV R16,R23
+   165: 0000E1   B908  OUT PORTC,R16
+   166: 
+   167: 0000E2   2F34  MOV r19,r20
+   168: 0000E3   9518  reti
+   169: 	increm:
+   170: 0000E4   2722  CLR r18
+   171:     ; 	si (r20 >= 9) alors saut res
+   172: 0000E5   2F04  MOV R16,R20
+   173: 0000E6   930F  PUSH R16
+   174: 0000E7   E009  LDI R16,9
+   175: 0000E8   911F  POP R17
+   176: 0000E9   1710  CP R17,R16
+   177: 0000EA   F410  BRSH eti9
+   178: 0000EB   2700  CLR R16
+   179: 0000EC   C001  RJMP eti10
+   180: eti9:
+   181: 0000ED   E001  LDI R16,0x01
+   182: eti10:
+   183: 0000EE   2300  TST R16
+   184: 0000EF   F011  BREQ eti11
+   185: 0000F0   940C  JMP res
+        0000F1   00F4
+   186: eti11:
+   187: 
+   188: 0000F2   9543  INC r20
+   189: 
+   190: 0000F3   9518  reti
+   191: 	res:
+   192: 0000F4   2744  CLR r20
+   193: 0000F5   9553  INC r21
+   194:     ; 	si (r21 <= 9) alors saut end
+   195: 0000F6   2F05  MOV R16,R21
+   196: 0000F7   930F  PUSH R16
+   197: 0000F8   E009  LDI R16,9
+   198: 0000F9   911F  POP R17
+   199: 0000FA   1710  CP R17,R16
+   200: 0000FB   F019  BREQ eti12
+   201: 0000FC   F010  BRLO eti12
+   202: 0000FD   2700  CLR R16
+   203: 0000FE   C001  RJMP eti13
+   204: eti12:
+   205: 0000FF   E001  LDI R16,0x01
+   206: eti13:
+   207: 000100   2300  TST R16
+   208: 000101   F011  BREQ eti14
+   209: 000102   940C  JMP end
+        000103   0117
+   210: eti14:
+   211: 
+   212: 000104   2755  CLR r21
+   213: 000105   9563  INC r22
+   214:     ; 	si (r22 <= 9) alors saut end
+   215: 000106   2F06  MOV R16,R22
+   216: 000107   930F  PUSH R16
+   217: 000108   E009  LDI R16,9
+   218: 000109   911F  POP R17
+   219: 00010A   1710  CP R17,R16
+   220: 00010B   F019  BREQ eti15
+   221: 00010C   F010  BRLO eti15
+   222: 00010D   2700  CLR R16
+   223: 00010E   C001  RJMP eti16
+   224: eti15:
+   225: 00010F   E001  LDI R16,0x01
+   226: eti16:
+   227: 000110   2300  TST R16
+   228: 000111   F011  BREQ eti17
+   229: 000112   940C  JMP end
+        000113   0117
+   230: eti17:
+   231: 
+   232: 000114   2744  CLR r20
+   233: 000115   2755  CLR r21
+   234: 000116   2766  CLR r22
+   235: 	end:	
+   236: 000117   9518  reti
+   237: 
+   238: affiche:
+   239:     ; 	PORTA@IO <- codeAff@ROM[r19]
+   240: 000118   2F03  MOV R16,R19
+   241: 000119   E0E0  LDI R30,low(codeAff<<1)
+   242: 00011A   E0F1  LDI R31,high(codeAff<<1)
+   243: 00011B   2711  CLR R17
+   244: 00011C   0FE0  ADD R30,R16
+   245: 00011D   1FF1  ADC R31,R17
+   246: 00011E   9104  LPM R16,Z
+   247: 00011F   B902  OUT PORTA,R16
+   248: 
+   249: 000120   9508  ret
+   250: 
+ -> Attention 006: Le materiel n'est pas specfie, le code ne sera pas verifie !
+ -> Attention 010: Jeu d'instructions peu clair, pas de documentation !
+ -> Attention 001: 2 symbole(s) defini mais inutilise !
+
+Programme              :      157 words.
+Constantes             :        8 words.
+Memoire totale occupee :      165 words.
+Taille en  Eeprom      :        0 bytes.
+Segment de donnees     :        0 bytes.
+Compilation terminee, pas d'erreur.
+Compilation terminee 29.03.2021, 17:45:00
